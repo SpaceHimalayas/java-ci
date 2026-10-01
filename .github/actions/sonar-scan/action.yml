@@ -1,0 +1,45 @@
+name: Sonar Scan
+description: Runs Maven verify and a SonarQube Cloud scan, then waits for the quality gate
+
+inputs:
+  sonar-token:
+    description: Sonar token
+    required: true
+  project-key:
+    description: Sonar project key
+    required: true
+  organization:
+    description: Sonar organization key
+    required: true
+  host-url:
+    description: Sonar server URL
+    required: false
+    default: https://sonarcloud.io
+
+runs:
+  using: composite
+  steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+        cache: maven
+
+    - name: Cache Sonar packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+
+    - name: Maven verify and Sonar analysis
+      shell: bash
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+      run: |
+        mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=${{ inputs.project-key }} \
+          -Dsonar.organization=${{ inputs.organization }} \
+          -Dsonar.host.url=${{ inputs.host-url }} \
+          -Dsonar.qualitygate.wait=true

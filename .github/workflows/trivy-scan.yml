@@ -1,0 +1,36 @@
+name: Trivy Scan (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      image-ref:
+        description: Image to scan
+        required: true
+        type: string
+      severity-threshold:
+        description: Severities that fail the build
+        required: false
+        type: string
+        default: CRITICAL
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trivy report scan (all severities, never fails)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ inputs.image-ref }}
+          format: table
+          severity: UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL
+          exit-code: '0'
+          ignore-unfixed: true
+
+      - name: Trivy gate scan (fails on threshold)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ inputs.image-ref }}
+          format: table
+          severity: ${{ inputs.severity-threshold }}
+          exit-code: '1'
+          ignore-unfixed: true
