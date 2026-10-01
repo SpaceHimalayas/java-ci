@@ -89,7 +89,7 @@ jobs:
       - name: Upload jar to Artifactory
         run: |
           jf rt upload "target/demo-app-*.jar" \
-            "demo-maven-local/com/example/demo-app/1.0.0/" --flat=true
+            "maven-local/com/example/demo-app/1.0.0/" --flat=true
 
       - name: Xray scan of the jar
         run: jf scan "target/demo-app-*.jar"
