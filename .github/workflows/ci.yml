@@ -63,7 +63,7 @@ jobs:
     needs: docker-build-push
     uses: ./.github/workflows/trivy-scan.yml
     with:
-      image-ref: ${{ needs.docker-build-push.outputs.image-ref }}
+      image-ref: sucharithareddyr6724/demo-app:${{ github.sha }}
       severity-threshold: CRITICAL
 
   jfrog-publish-scan:
